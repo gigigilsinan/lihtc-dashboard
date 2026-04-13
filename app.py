@@ -19,6 +19,7 @@ df = load_data()
 
 # create app
 app = Dash(__name__)
+server = app.server
 
 # =========================
 # Dropdown options
