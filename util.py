@@ -5,7 +5,7 @@ import requests
 NYC_9_URL = "https://data.cityofnewyork.us/resource/frre-6z6q.json?$limit=50000"
 NYC_4_URL = "https://data.cityofnewyork.us/resource/p8i7-ix2s.json?$limit=50000"
 
-APP_TOKEN = None  # optional later if you want one
+APP_TOKEN = None
 
 
 def fetch_socrata_json(url: str, credit_type: str) -> pd.DataFrame:
@@ -48,7 +48,7 @@ def load_data():
     else:
         df["year"] = pd.NA
 
-    # 9% amount: CRA Amount
+    # 9% amount
     if "cra_amount" in df.columns:
         df["cra_amount"] = (
             df["cra_amount"]
@@ -61,7 +61,7 @@ def load_data():
     else:
         df["cra_amount"] = pd.NA
 
-    # 4% amount: DOCE Amount
+    # 4% amount
     if "doce_amount" in df.columns:
         df["doce_amount"] = (
             df["doce_amount"]
@@ -115,32 +115,29 @@ def load_data():
     else:
         df["developer"] = pd.NA
 
-    # Project name fallback
+    # Project name
     if "project_name" not in df.columns:
         df["project_name"] = pd.NA
 
-    # -----------------------------
-    # Coordinate fallback for maps
-    # -----------------------------
+    # Coordinates
     if "latitude" not in df.columns:
         df["latitude"] = pd.NA
 
     if "longitude" not in df.columns:
         df["longitude"] = pd.NA
 
-    # fill missing lat/lon from alternate fields if available
     for alt_lat in ["latitude_1", "latitude_internal", "lat", "y_coord"]:
         if alt_lat in df.columns:
             df["latitude"] = df["latitude"].combine_first(df[alt_lat])
 
-    for alt_lon in ["longitude_internal", "lon", "lng", "x_coord"]:
+    for alt_lon in ["longitude_1", "longitude_internal", "lon", "lng", "x_coord"]:
         if alt_lon in df.columns:
             df["longitude"] = df["longitude"].combine_first(df[alt_lon])
 
     df["latitude"] = pd.to_numeric(df["latitude"], errors="coerce")
     df["longitude"] = pd.to_numeric(df["longitude"], errors="coerce")
 
-    # Construction type cleaning
+    # Construction type
     if "new_construction" in df.columns:
         raw_col = df["new_construction"]
     elif "new_construction_rehabilitation" in df.columns:
